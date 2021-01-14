@@ -60,3 +60,49 @@
   (let [lines (str/split-lines input)
         initial-state {:x 0 :y 0 :fx + :fy nop}]
     (count-directions (reduce nav initial-state lines))))
+
+(defn move-ship-to-waypoint
+  [waypoint ship]
+  (merge ship {:x (+ (:x waypoint) (:x ship))
+               :y (+ (:y waypoint) (:y ship))}))
+
+(defn mul
+  [state value]
+  (merge state {:x (* value (:x state))
+                :y (* value (:y state))}))
+
+(defn turn2
+  [degree direction state]
+  (loop [n (/ degree 90)
+         result state]
+    (if (= n 0)
+      result
+      (recur (dec n)
+             (condp = direction
+               :right {:x (:y result) :y (* -1 (:x result))}
+               :left {:x (* -1 (:y result)) :y (:x result)}
+               )
+             ))))
+
+(defn nav2
+  [state instruction]
+  (let [[action value] (parse-instruction instruction)
+        waypoint (:waypoint state)
+        ship (:ship state)]
+    (condp = action
+      :forward {:waypoint waypoint :ship (move-ship-to-waypoint (mul waypoint value) ship)}
+      :north {:waypoint (assoc waypoint :y (+ (:y waypoint) value)) :ship ship}
+      :south {:waypoint (assoc waypoint :y (- (:y waypoint) value)) :ship ship}
+      :east {:waypoint (assoc waypoint :x (+ (:x waypoint) value)) :ship ship}
+      :west {:waypoint (assoc waypoint :x (- (:x waypoint) value)) :ship ship}
+      :right {:waypoint (turn2 value action waypoint) :ship ship}
+      :left {:waypoint (turn2 value action waypoint) :ship ship}
+      )))
+
+(defn solve-2
+  [input]
+  (let [lines (str/split-lines input)
+        initial-state {:waypoint {:x 10 :y 1}
+                       :ship     {:x 0 :y 0}}
+        result (reduce nav2 initial-state lines)]
+    (count-directions (:ship result))))

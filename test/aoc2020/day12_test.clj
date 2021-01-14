@@ -37,7 +37,7 @@
     (is (= {:x 17 :y 3 :fx + :fy nop}
            (nav {:x 10 :y 3 :fx + :fy nop} "F7")))
 
-    (is (=  {:x 17 :y 3 :fx nop :fy -}
+    (is (= {:x 17 :y 3 :fx nop :fy -}
            (nav {:x 17 :y 3 :fx + :fy nop} "R90")))
 
     (is (= {:x 17 :y -8 :fx nop :fy -}
@@ -49,5 +49,41 @@
   (testing "solve 1"
 
     ;(is (= 582 (solve-1 input)))
+
+    ))
+
+(deftest nav-test
+  (testing "nav2"
+
+    (is (= {:waypoint {:x 10 :y 1}
+            :ship     {:x 100 :y 10}}
+           (nav2
+             {:waypoint {:x 10 :y 1}
+              :ship     {:x 0 :y 0}} "F10")))
+
+    (is (= {:waypoint {:x 10 :y 4}
+            :ship     {:x 100 :y 10}}
+           (nav2
+             {:waypoint {:x 10 :y 1}
+              :ship     {:x 100 :y 10}} "N3")))
+
+    (is (= {:waypoint {:x 10 :y 4}
+            :ship     {:x 170 :y 38}}
+           (nav2
+             {:waypoint {:x 10 :y 4}
+              :ship     {:x 100 :y 10}} "F7")))
+
+    (is (= {:waypoint {:x 4 :y -10}
+            :ship     {:x 214 :y -72}}
+           (nav2
+             {:waypoint {:x 4 :y -10}
+              :ship     {:x 170 :y 38}} "F11")))
+
+    ))
+
+(deftest solve-2-test
+  (testing "solve 2"
+
+    ;(is (= 52069 (solve-2 input)))
 
     ))
