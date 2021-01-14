@@ -3,7 +3,7 @@
   (:require [aoc2020.day12 :refer :all]
             [clojure.java.io :as io]))
 
-(def input (slurp (io/resource "day12.txt")))
+;(def input (slurp (io/resource "day12.txt")))
 
 (deftest parse-instruction-test
   (testing "parse-instruction"
@@ -18,56 +18,30 @@
 
     ))
 
-(deftest turn-test
-  (testing "turn-right"
-
-    (is (= :south (turn 90 :right :east)))
-    (is (= :west (turn 90 :right :south)))
-    (is (= :north (turn 90 :right :west)))
-    (is (= :east (turn 90 :right :north)))
-
-    )
-
-  (testing "turn-left"
-
-    (is (= :north (turn 90 :left :east)))
-    (is (= :west (turn 90 :left :north)))
-    (is (= :south (turn 90 :left :west)))
-    (is (= :east (turn 90 :left :south)))
-
-    (is (= :west (turn 180 :left :east)))
-    (is (= :south (turn 270 :left :east)))
-    (is (= :east (turn 360 :left :east)))
-
-    ))
-
 (deftest count-directions-test
   (testing "count-directions"
 
-    (is (= 25 (count-directions {:north 0 :south 8 :west 0 :east 17 :current :south})))
+    (is (= 25 (count-directions {:x 17 :y -8 :fx nop :fy -})))
 
     ))
 
 (deftest nav-test
   (testing "nav"
 
-    (is (= {:north 0 :south 0 :west 0 :east 10 :current :east}
-           (nav {:north 0 :south 0 :west 0 :east 0 :current :east} "F10")))
+    (is (= {:x 10 :y 0 :fx + :fy nop}
+           (nav {:x 0 :y 0 :fx + :fy nop} "F10")))
 
-    (is (= {:north 3 :south 0 :west 0 :east 10 :current :east}
-           (nav {:north 0 :south 0 :west 0 :east 10 :current :east} "N3")))
+    (is (= {:x 10 :y 3 :fx + :fy nop}
+           (nav {:x 10 :y 0 :fx + :fy nop} "N3")))
 
-    (is (= {:north 3 :south 0 :west 0 :east 17 :current :east}
-           (nav {:north 3 :south 0 :west 0 :east 10 :current :east} "F7")))
+    (is (= {:x 17 :y 3 :fx + :fy nop}
+           (nav {:x 10 :y 3 :fx + :fy nop} "F7")))
 
-    (is (= {:north 3 :south 0 :west 0 :east 20 :current :east}
-           (nav {:north 3 :south 0 :west 0 :east 10 :current :east} "F10")))
+    (is (=  {:x 17 :y 3 :fx nop :fy -}
+           (nav {:x 17 :y 3 :fx + :fy nop} "R90")))
 
-    (is (= {:north 3 :south 0 :west 0 :east 17 :current :south}
-           (nav {:north 3 :south 0 :west 0 :east 17 :current :east} "R90")))
-
-    (is (= {:north 0 :south 8 :west 0 :east 17 :current :south}
-           (nav {:north 3 :south 0 :west 0 :east 17 :current :south} "F11")))
+    (is (= {:x 17 :y -8 :fx nop :fy -}
+           (nav {:x 17 :y 3 :fx nop :fy -} "F11")))
 
     ))
 

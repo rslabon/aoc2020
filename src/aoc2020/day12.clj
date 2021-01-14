@@ -16,49 +16,47 @@
       )
     ))
 
+(defn count-directions
+  [state]
+  (+ (Math/abs (:x state)) (Math/abs (:y state))))
+
+(defn nop
+  [x & y]
+  x)
+
 (defn turn
-  [degree direction from]
-  (let [directions [:east :south :west :north]
-        size (count directions)
+  [fx fy degree direction]
+  (let [clockwise [{:fx nop :fy -} {:fx - :fy nop} {:fx nop :fy +} {:fx + :fy nop}]
+        idx (.indexOf clockwise {:fx fx :fy fy})
+        size (count clockwise)
         n (/ degree 90)
         next-fn (condp = direction
                   :right #(+ % n)
                   :left #(- % n))
-        current-idx (.indexOf directions from)
-        next-idx (mod (next-fn current-idx) size)]
-    (nth directions next-idx)
+        next-idx (mod (next-fn idx) size)
+        ]
+    (nth clockwise next-idx)
     ))
-
-(defn opposite
-  [direction]
-  (direction {:east  :west
-              :west  :east
-              :north :south
-              :south :north}))
-
-(defn count-directions
-  [state]
-  (reduce + (map #(Math/abs %) (filter number? (map last state)))))
 
 (defn nav
   [state instruction]
   (let [[action value] (parse-instruction instruction)
-        current-direction (:current state)]
-    (cond
-      (= current-direction action) (update state action #(+ % value))
-      (= action :forward) (let [opposite-direction (opposite current-direction)]
-                            (-> state
-                                (update current-direction #(-> %
-                                                               (+ value)
-                                                               (- (opposite-direction state))))
-                                (assoc opposite-direction 0)))
-      (or (= action :right) (= action :left)) (let [new-direction (turn value action current-direction)]
-                                                (assoc state :current new-direction))
-      :else (update state action #(+ % value))
+        x (:x state)
+        y (:y state)
+        fx (:fx state)
+        fy (:fy state)]
+    (condp = action
+      :forward (merge state {:x (fx x value) :y (fy y value)})
+      :north (assoc state :y (+ y value))
+      :south (assoc state :y (- y value))
+      :east (assoc state :x (+ x value))
+      :west (assoc state :x (- x value))
+      :right (merge state (turn fx fy value action))
+      :left (merge state (turn fx fy value action))
       )))
 
 (defn solve-1
   [input]
   (let [lines (str/split-lines input)
-        initial-state {:north 0 :south 0 :west 0 :east 0 :current :east}]
+        initial-state {:x 0 :y 0 :fx + :fy nop}]
     (count-directions (reduce nav initial-state lines))))
