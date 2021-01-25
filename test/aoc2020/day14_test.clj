@@ -10,14 +10,14 @@
 (deftest write-mem-test
   (testing "write-mem"
 
-    (is (= {8 2r1011 :mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
-           (write-mem {:mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} 8 2r1011)))
+    (is (= {8 2r1011 :mask "XXXX"}
+           (write-mem {:mask "XXXX"} 8 2r1011)))
 
-    (is (= {8 2r1011 :mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
-           (write-mem {8 1000 :mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} 8 2r1011)))
+    (is (= {8 2r1011 :mask "XXXXX"}
+           (write-mem {8 1000 :mask "XXXXX"} 8 2r1011)))
 
-    (is (= {8 2r1001001 :mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X"}
-           (write-mem {:mask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X"} 8 2r1011)))
+    (is (= {8 2r1001001 :mask "1XXXX0X"}
+           (write-mem {:mask "1XXXX0X"} 8 2r1011)))
 
     ))
 
