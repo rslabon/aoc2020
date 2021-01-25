@@ -48,12 +48,24 @@
         bus-ids (mapv (fn [[bus-id idx]] [(Long/parseLong bus-id) idx]) bus-ids)]
     bus-ids))
 
+(defn inv-mod
+  [a b]
+  (.modInverse (biginteger a) (biginteger b)))
+
+(defn chinese-remainder
+  [n a]
+  (let [N (reduce * n)
+        result (reduce + (for [i (range (count n))]
+                           (let [ai (nth a i)
+                                 ni (nth n i)
+                                 mi (bigint (Math/floor (/ N ni)))
+                                 ci (* mi (inv-mod mi ni))]
+                             (* ai ci))))]
+    (mod result N)))
+
 (defn solve-2
   [timetable]
-  (let [[bus-id offset] (last (sort timetable))]
-    (loop [idx 1]
-      (if (found-timestamp? (- (* bus-id idx) offset) timetable)
-        (- (* bus-id idx) offset)
-        (recur (inc idx))
-        )
-      )))
+  (let [new-timetable (mapv (fn [[bus-id offset]] [bus-id (- bus-id offset)]) timetable)
+        n (mapv first new-timetable)
+        a (mapv second new-timetable)]
+    (chinese-remainder n a)))
