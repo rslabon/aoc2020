@@ -91,12 +91,9 @@
 
 (defn solve-1
   [input]
-  (loop [memory {}
-         lines (str/split-lines input)]
-    (if (empty? lines)
-      (sum-of-memory memory)
-      (recur (apply-line (first lines) memory) (rest lines))
-      )))
+  (sum-of-memory
+    (reduce (fn [memory line] (apply-line line memory)) {} (str/split-lines input))
+    ))
 
 (defn apply-line2
   [line memory]
@@ -108,9 +105,6 @@
 
 (defn solve-2
   [input]
-  (loop [memory {}
-         lines (str/split-lines input)]
-    (if (empty? lines)
-      (sum-of-memory memory)
-      (recur (apply-line2 (first lines) memory) (rest lines))
-      )))
+  (sum-of-memory
+    (reduce (fn [memory line] (apply-line2 line memory)) {} (str/split-lines input))
+  ))
