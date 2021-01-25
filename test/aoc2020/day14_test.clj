@@ -8,16 +8,16 @@
 (def example-input2 "mask = 000000000000000000000000000000X1001X\nmem[42] = 100\nmask = 00000000000000000000000000000000X0XX\nmem[26] = 1")
 
 (deftest write-mem-test
-  (testing "write-mem"
+  (testing "write-memory"
 
     (is (= {8 2r1011 :mask "XXXX"}
-           (write-mem {:mask "XXXX"} 8 2r1011)))
+           (write-memory {:mask "XXXX"} 8 2r1011)))
 
     (is (= {8 2r1011 :mask "XXXXX"}
-           (write-mem {8 1000 :mask "XXXXX"} 8 2r1011)))
+           (write-memory {8 1000 :mask "XXXXX"} 8 2r1011)))
 
     (is (= {8 2r1001001 :mask "1XXXX0X"}
-           (write-mem {:mask "1XXXX0X"} 8 2r1011)))
+           (write-memory {:mask "1XXXX0X"} 8 2r1011)))
 
     ))
 
@@ -41,7 +41,7 @@
     ))
 
 (deftest write-mem2-test
-  (testing "write-mem2"
+  (testing "write-memory2"
 
     (is (= ["0" "1"] (floating-combinations "X" 0)))
     (is (= ["00" "01" "10" "11"] (floating-combinations "XX" 0)))
@@ -49,7 +49,7 @@
     (is (= ["011010" "011011" "111010" "111011"] (floating-combinations "X1101X" 0)))
 
     (is (= {2r011010 19 2r011011 19 2r111010 19 2r111011 19 :mask "X1001X"}
-           (write-mem2 {:mask "X1001X"} 2r101010 19)))
+           (write-memory2 {:mask "X1001X"} 2r101010 19)))
 
     ))
 

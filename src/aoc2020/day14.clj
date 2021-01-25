@@ -20,7 +20,7 @@
         value-with-mask (Long/parseLong value-with-mask 2)]
     value-with-mask))
 
-(defn write-mem
+(defn write-memory
   [memory address value]
   (let [mask (:mask memory)
         m-size (count mask)
@@ -57,7 +57,7 @@
         addresses (map #(Long/parseLong % 2) addresses)]
     addresses))
 
-(defn write-mem2
+(defn write-memory2
   [memory address value]
   (let [mask (:mask memory)
         m-size (count mask)
@@ -82,7 +82,7 @@
   (let [[opcode & args] (parse-command line)]
     (condp = opcode
       :mask (assoc memory :mask (first args))
-      :memory (write-mem memory (first args) (second args))
+      :memory (write-memory memory (first args) (second args))
       )))
 
 (defn sum-of-memory
@@ -103,7 +103,7 @@
   (let [[opcode & args] (parse-command line)]
     (condp = opcode
       :mask (assoc memory :mask (first args))
-      :memory (write-mem2 memory (first args) (second args))
+      :memory (write-memory2 memory (first args) (second args))
       )))
 
 (defn solve-2
