@@ -25,10 +25,10 @@
   (testing "apply-line"
 
     (is (= {:mask "XX0101"}
-           (apply-line "mask = XX0101" {})))
+           (apply-line "mask = XX0101" {} write-memory)))
 
     (is (= {1 6 :mask "XXXX"}
-           (apply-line "mem[1] = 6" {:mask "XXXX"})))
+           (apply-line "mem[1] = 6" {:mask "XXXX"} write-memory)))
 
     ))
 

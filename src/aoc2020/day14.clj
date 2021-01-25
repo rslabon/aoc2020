@@ -78,19 +78,11 @@
     ))
 
 (defn apply-line
-  [line memory]
+  [line memory write-fn]
   (let [[opcode & args] (parse-command line)]
     (condp = opcode
       :mask (assoc memory :mask (first args))
-      :memory (write-memory memory (first args) (second args))
-      )))
-
-(defn apply-line2
-  [line memory]
-  (let [[opcode & args] (parse-command line)]
-    (condp = opcode
-      :mask (assoc memory :mask (first args))
-      :memory (write-memory2 memory (first args) (second args))
+      :memory (write-fn memory (first args) (second args))
       )))
 
 (defn sum-of-memory
@@ -98,15 +90,15 @@
   (reduce + (vals (dissoc memory :mask))))
 
 (defn solve
-  [input apply]
+  [input write-fn]
   (sum-of-memory
-    (reduce (fn [memory line] (apply line memory)) {} (str/split-lines input))
+    (reduce (fn [memory line] (apply-line line memory write-fn)) {} (str/split-lines input))
     ))
 
 (defn solve-1
   [input]
-  (solve input apply-line))
+  (solve input write-memory))
 
 (defn solve-2
   [input]
-  (solve input apply-line2))
+  (solve input write-memory2))
