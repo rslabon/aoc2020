@@ -85,16 +85,6 @@
       :memory (write-memory memory (first args) (second args))
       )))
 
-(defn sum-of-memory
-  [memory]
-  (reduce + (vals (dissoc memory :mask))))
-
-(defn solve-1
-  [input]
-  (sum-of-memory
-    (reduce (fn [memory line] (apply-line line memory)) {} (str/split-lines input))
-    ))
-
 (defn apply-line2
   [line memory]
   (let [[opcode & args] (parse-command line)]
@@ -103,8 +93,20 @@
       :memory (write-memory2 memory (first args) (second args))
       )))
 
+(defn sum-of-memory
+  [memory]
+  (reduce + (vals (dissoc memory :mask))))
+
+(defn solve
+  [input apply]
+  (sum-of-memory
+    (reduce (fn [memory line] (apply line memory)) {} (str/split-lines input))
+    ))
+
+(defn solve-1
+  [input]
+  (solve input apply-line))
+
 (defn solve-2
   [input]
-  (sum-of-memory
-    (reduce (fn [memory line] (apply-line2 line memory)) {} (str/split-lines input))
-  ))
+  (solve input apply-line2))
