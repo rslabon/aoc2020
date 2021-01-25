@@ -35,18 +35,22 @@
     v-char
     m-char))
 
+(defn str-replace-at-index
+  [s index value]
+  (apply str (assoc (vec s) index value)))
+
 (defn floating-combinations
-  ;value = X1101X -> 011010, 011011, 111010, 111011
-  [value index]
-  (let [size (count value)]
+  ;floating-bits = X1101X -> 011010, 011011, 111010, 111011
+  [floating-bits index]
+  (let [size (count floating-bits)]
     (if (>= index size)
-      [value]
-      (if (= \X (nth value index))
+      [floating-bits]
+      (if (= \X (nth floating-bits index))
         (vec (concat
-               (floating-combinations (apply str (assoc (vec value) index "0")) (inc index))
-               (floating-combinations (apply str (assoc (vec value) index "1")) (inc index))
+               (floating-combinations (str-replace-at-index floating-bits index "0") (inc index))
+               (floating-combinations (str-replace-at-index floating-bits index "1") (inc index))
                ))
-        (floating-combinations value (inc index))
+        (floating-combinations floating-bits (inc index))
         ))))
 
 (defn apply-mask-to-address
