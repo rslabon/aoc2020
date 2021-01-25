@@ -91,9 +91,13 @@
 
 (defn solve
   [input write-fn]
-  (sum-of-memory
-    (reduce (fn [memory line] (apply-line line memory write-fn)) {} (str/split-lines input))
-    ))
+  (let [lines (str/split-lines input)
+        initial-memory {}
+        final-memory (reduce
+                       (fn [memory line] (apply-line line memory write-fn))
+                       initial-memory
+                       lines)]
+    (sum-of-memory final-memory)))
 
 (defn solve-1
   [input]
