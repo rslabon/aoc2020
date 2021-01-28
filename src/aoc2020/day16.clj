@@ -51,9 +51,9 @@
     ))
 
 (defn match-rules
-  [rules numbers]
+  [rules values]
   (let [found (filter (fn [[_ ranges]]
-                        (every? #(in-range? % ranges) numbers)
+                        (every? #(in-range? % ranges) values)
                         ) rules)]
     (mapv first found)))
 
@@ -68,14 +68,14 @@
   )
 
 (defn find-possibilities
-  [rules valid-columns]
-  (loop [current-valid-columns valid-columns
-         result []]
-    (if (empty? current-valid-columns)
-      result
-      (let [valid-column (first current-valid-columns)
-            possible-rules (match-rules rules valid-column)]
-        (recur (rest current-valid-columns) (conj result possible-rules)))
+  [rules matrix]
+  (loop [current-matrix matrix
+         possibilities []]
+    (if (empty? current-matrix)
+      possibilities
+      (let [values (first current-matrix)
+            possible-rules (match-rules rules values)]
+        (recur (rest current-matrix) (conj possibilities possible-rules)))
       )))
 
 (defn drop-from-possibilities
