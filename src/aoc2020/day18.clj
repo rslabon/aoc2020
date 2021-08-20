@@ -1,7 +1,7 @@
 (ns aoc2020.day18
   (:require [clojure.string :as str]))
 
-(defn parse
+(defn parse-expr
   [input]
   (let [line (str/replace input "(" "[")
         line (str/replace line ")" "]")
@@ -11,7 +11,7 @@
 
 (defn apply-operation
   [operation first-operand second-operand]
-  (let [operation (if (fn? operation) operation (resolve (symbol operation)))]
+  (let [operation (if (fn? operation) operation @(resolve (symbol operation)))]
     (operation first-operand second-operand)))
 
 (defn calc [expression]
