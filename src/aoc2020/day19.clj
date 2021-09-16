@@ -41,7 +41,7 @@
                ) text rules))))
 
 (defn repeat-regex-parts
-  "Return regex as \"((a{1}b{1})|(a{1}b{1})|(a{2}b{2})|...|(a{n}b{n}))\""
+  "Return regex as \"((a{1}b{1})|(a{2}b{2})|...|(a{n}b{n}))\""
   [a b n]
   (str "(" (reduce (fn [acc val] (str acc "|" "((" a "){" val "}" "(" b "){" val "})")) (str "((" a "){1}" "(" b "){1})") (range 2 n)) ")")
   )
