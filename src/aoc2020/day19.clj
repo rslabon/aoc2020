@@ -20,7 +20,7 @@
                                                                           (str/trim)
                                                                           (str/split #" ")
                                                                           )))]
-                                    {idx [rules sub-rules]}))))
+                                    {idx (remove empty? [rules sub-rules])}))))
 
 (defn parse-rule-def
   [input]
@@ -37,6 +37,5 @@
                (let [rule-body (get rules-def val)]
                  (if (char? rule-body)
                    (map #(str % rule-body) (flatten [acc]))
-                   (gen rules-def rule-body acc)
-                   ))
+                   (gen rules-def rule-body acc)))
                ) text rules))))
