@@ -6,9 +6,6 @@
 
 (def puzzle-input (slurp (io/resource "day19.txt")))
 
-
-
-
 ;0: 4 1 5
 ;1: 2 3 | 3 2
 ;2: 4 4 | 5 5
@@ -24,93 +21,35 @@
 
 (def rules-def {0 [[4 1 5] []], 1 [[2 3] [3 2]], 2 [[4 4] [5 5]], 3 [[4 5] [5 4]], 4 \a, 5 \b})
 
-;(defn check
-;  ([rules-def rules chars]
-;   (let [_ (println rules chars)]
-;     (cond
-;       (and (empty? rules) (empty? chars)) true
-;       (empty? rules) true
-;       (empty? chars) false
-;       :else (let [rule (first rules)
-;                   char (first chars)
-;                   rule-body (get rules-def rule)
-;                   _ (println "rule=" rule "___" rule-body "___" (rest rules) chars)
-;                   ]
-;               (and
-;                 (cond (char? rule-body) (= rule-body char)
-;                       (coll? rule-body) (if (coll? (first rule-body))
-;                                           (or (check rules-def (first rule-body) chars) (check rules-def (second rule-body) chars))
-;                                           (check rules-def rule-body chars)))
-;                 (check rules-def (rest rules) (rest chars)))))))
-;  ([rules-def text]
-;   (check rules-def [0] (vec (.toCharArray text)))
-;   ))
+(defn to-regex
+  ([rules-def] (str "^" (to-regex rules-def [0]) "$"))
+  ([rules-def rules]
+   (if (empty? rules)
+     ""
+     (let [rule (first rules)
+           rule-body (get rules-def rule)
+           _ (println "xxx" rule rule-body)]
+       (str (if (char? rule-body) (str rule-body)
+                                  (if (coll? (first rule-body))
+                                    (let [sub-rules (first rule-body)
+                                          sub-rules2 (second rule-body)
+                                          r1 (to-regex rules-def sub-rules)
+                                          r2 (to-regex rules-def sub-rules2)
+                                          r (if (empty? r2) r1 (str "(" r1 "|" r2 ")"))]
+                                      r)
+                                    (reduce (fn [acc other-rule] (str acc (to-regex rules-def [other-rule]))) "" rule-body)
+                                    )
+                                  ) (to-regex rules-def (rest rules)))))))
 
-(defn check
-  ([rules-def rules chars]
-   (cond
-     (and (empty? rules) (empty? chars)) [true []]
-     (empty? rules) [true chars]
-     (empty? chars) [false []]
-     :else (let [rule (first rules)
-                 char (first chars)
-                 rule-body (get rules-def rule)
-                 [valid chars-to-match]
-                 (cond (char? rule-body) (if (= rule-body char) [true (rest chars)] [false chars])
-                       (coll? rule-body) (if (coll? (first rule-body))
-                                           (let [[sub-valid sub-chars-to-match] (check rules-def (first rule-body) chars)]
-                                             (if (true? sub-valid)
-                                               [sub-valid sub-chars-to-match]
-                                               (check rules-def (second rule-body) chars))
-                                             )
-                                           (check rules-def rule-body chars)))
-                 _ (println "xxx_" valid rules rule rule-body chars)
-                 ]
-             (if (true? valid)
-               (check rules-def (rest rules) chars-to-match)
-               [valid chars]
-               ))))
-  ([rules-def text]
-   (let [[_ not-matched-chars] (check rules-def [0] (vec (.toCharArray text)))]
-     (do
-       (println not-matched-chars)
-       (empty? not-matched-chars)
-       )
-     )))
-
-(deftest check-test
-  (testing "check"
-    (is (= true (check {0 \a} "a")))
-    (is (= true (check {0 [1 1 1], 1 \a} "aaa")))
-    (is (= false (check {0 [[1 1 1] []], 1 \a} "b")))
-    (is (= false (check {0 [1 1 1], 1 \a} "aab")))
-    (is (= true (check {0 [[1 1][2 2]], 1 \a, 2 \b} "aa")))
-    (is (= true (check {0 [[1 1][2 2]], 1 \a, 2 \b} "bb")))
-    (is (= false (check {0 [[1 1][2 2]], 1 \a, 2 \b} "ab")))
-    (is (= false (check {0 [[1 1][2 2]], 1 \a, 2 \b} "a")))
-    (is (= false (check {0 [[1 1][2 2]], 1 \a, 2 \b} "aaa")))
-    (is (= true (check {0 [[1 1][1 3]], 1 \a, 2 \b, 3 [[2 1]]} "aba")))
-    (is (= false (check {0 [[1 1][1 3]], 1 \a, 2 \b, 3 [[2 1]]} "abaa")))
-    (is (= true (check {0 [[1 1][1 3]], 1 \a, 2 \b, 3 [[2 1 2 1]]} "ababa")))
-    (is (= false (check {0 [[1 1][1 3]], 1 \a, 2 \b, 3 [[2 1 2 1]]} "abaaa")))
-    (is (= true (check {0 [[1 1][]], 1 \a} "aa")))
-    (is (= true (check {0 [[1 1] [1 3 1]], 1 \a, 2 \b, 3 [[2 1 2 1]]} "ababaa")))
-    (is (= true (check rules-def "ababbb")))
-    (is (= true (check rules-def "abbbab")))
-    (is (= false (check rules-def "bababa")))
-    (is (= false (check rules-def "aaabbb")))
-    (is (= false (check rules-def "aaabbb")))
-    (is (= false (check rules-def "aaaabbb")))
-
-    (is (= true (check rules-def "aaaabb")))
-    (is (= true (check rules-def "aaabab")))
-    (is (= true (check rules-def "abbabb")))
-    (is (= true (check rules-def "abbbab")))
-    (is (= true (check rules-def "aabaab")))
-    (is (= true (check rules-def "aabbbb")))
-    (is (= true (check rules-def "abaaab")))
-    (is (= true (check rules-def "ababbb")))
-
+(deftest to-regex-test
+  (testing "to-regex"
+    (is (= "^a$" (to-regex {0 \a})))
+    (is (= "^aaa$" (to-regex {0 [1 1 1], 1 \a})))
+    (is (= "^(a|b)$" (to-regex {0 [[1] [2]], 1 \a, 2 \b})))
+    (is (= "^a$" (to-regex {0 [[1] []], 1 \a, 2 \b})))
+    (is (= "^a$" (to-regex {0 [[1]], 1 \a, 2 \b})))
+    (is (= "^aa$" (to-regex {0 [[1 2]], 1 [[2]], 2 \a})))
+    (is (= "" (to-regex rules-def)))
     ))
 
 (deftest gen-test
@@ -162,15 +101,12 @@
   [input]
   (let [[rules-def-input messages] (str/split input #"\n\n")
         rules-def (parse-rule-def rules-def-input)
-        _ (println rules-def)
-        messages ["aabbabbbbbbbaaaaaabaaabb"]
-        matched (map #(check rules-def %) messages)
-        _ (println matched)
-        ;possible-matches (set (gen rules-def [0]))
-        ;matched (map #(contains? possible-matches %) messages)
+        messages (str/split-lines messages)
+        regex (re-pattern (to-regex rules-def))
+        matched (map #(re-matches regex %) messages)
         ;_ (println matched)
         ]
-    (count (filter true? matched))
+    (count (remove nil? matched))
     ))
 
 (deftest solve-1-test
