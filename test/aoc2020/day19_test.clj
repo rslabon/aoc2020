@@ -41,15 +41,14 @@
                                               (reduce (fn [acc other-rule] (str acc (to-regex rules-def [other-rule]))) "" rule-body)
                                               )
                                             )
-           rule-regex (if (= rule 8)
-                        (str "(" rule-regex ")+")
-                        rule-regex)
-           rule-regex (if (= rule 11)
-                        (let [rule42 (to-regex rules-def [42])
-                              rule31 (to-regex rules-def [31])]
-                          (str "(" (reduce (fn [acc val] (str  acc "|" "((" rule42 "){" val "}" "(" rule31 "){" val "})")  ) (str "((" rule42 "){1}" "(" rule31 "){1})") (range 2 10)) ")")
-                          )
-                        rule-regex)
+           rule-regex (cond
+                        (= rule 8) (str "(" rule-regex ")+")
+                        (= rule 11) (let [rule42 (to-regex rules-def [42])
+                                          rule31 (to-regex rules-def [31])]
+                                      (str "(" (reduce (fn [acc val] (str acc "|" "((" rule42 "){" val "}" "(" rule31 "){" val "})")) (str "((" rule42 "){1}" "(" rule31 "){1})") (range 2 10)) ")")
+                                      )
+                        :else rule-regex
+                        )
            result (str rule-regex (to-regex rules-def (rest rules)))]
        result
        ))))
