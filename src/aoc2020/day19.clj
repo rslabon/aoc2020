@@ -40,6 +40,12 @@
                    (gen rules-def rule-body acc)))
                ) text rules))))
 
+(defn repeat-regex-parts
+  "Return regex as \"((a{1}b{1})|(a{1}b{1})|(a{2}b{2})|...|(a{n}b{n}))\""
+  [a b n]
+  (str "(" (reduce (fn [acc val] (str acc "|" "((" a "){" val "}" "(" b "){" val "})")) (str "((" a "){1}" "(" b "){1})") (range 2 n)) ")")
+  )
+
 (defn to-regex
   ([rules-def] (str "^" (to-regex rules-def [0]) "$"))
   ([rules-def rules]
@@ -64,8 +70,7 @@
                         (= rule 8) (str "(" rule-regex ")+")
                         (= rule 11) (let [rule42 (to-regex rules-def [42])
                                           rule31 (to-regex rules-def [31])]
-                                      (str "(" (reduce (fn [acc val] (str acc "|" "((" rule42 "){" val "}" "(" rule31 "){" val "})")) (str "((" rule42 "){1}" "(" rule31 "){1})") (range 2 10)) ")")
-                                      )
+                                      (repeat-regex-parts rule42 rule31 10))
                         :else rule-regex
                         )
            result (str rule-regex (to-regex rules-def (rest rules)))]
