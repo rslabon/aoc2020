@@ -21,38 +21,6 @@
 
 (def rules-def {0 [[4 1 5] []], 1 [[2 3] [3 2]], 2 [[4 4] [5 5]], 3 [[4 5] [5 4]], 4 \a, 5 \b})
 
-(defn to-regex
-  ([rules-def] (str "^" (to-regex rules-def [0]) "$"))
-  ([rules-def rules]
-   (if (empty? rules)
-     ""
-     (let [rule (first rules)
-           rule-body (get rules-def rule)
-           rule-body (if (= rule 8) [[42]] rule-body)
-           rule-body (if (= rule 11) [[]] rule-body)
-           rule-regex (if (char? rule-body) (str rule-body)
-                                            (if (coll? (first rule-body))
-                                              (let [sub-rules (first rule-body)
-                                                    sub-rules2 (second rule-body)
-                                                    r1 (to-regex rules-def sub-rules)
-                                                    r2 (to-regex rules-def sub-rules2)
-                                                    r (if (empty? r2) r1 (str "(" r1 "|" r2 ")"))]
-                                                r)
-                                              (reduce (fn [acc other-rule] (str acc (to-regex rules-def [other-rule]))) "" rule-body)
-                                              )
-                                            )
-           rule-regex (cond
-                        (= rule 8) (str "(" rule-regex ")+")
-                        (= rule 11) (let [rule42 (to-regex rules-def [42])
-                                          rule31 (to-regex rules-def [31])]
-                                      (str "(" (reduce (fn [acc val] (str acc "|" "((" rule42 "){" val "}" "(" rule31 "){" val "})")) (str "((" rule42 "){1}" "(" rule31 "){1})") (range 2 10)) ")")
-                                      )
-                        :else rule-regex
-                        )
-           result (str rule-regex (to-regex rules-def (rest rules)))]
-       result
-       ))))
-
 (deftest to-regex-test
   (testing "to-regex"
     (is (= "^a$" (to-regex {0 \a})))
