@@ -263,7 +263,7 @@ def find_corners(id_to_tiles):
             corners = []
 
             t = tile
-            corners.append(t.id)
+            corners.append(t)
 
             p = None
             i = 0
@@ -275,7 +275,7 @@ def find_corners(id_to_tiles):
             if i < image_size:
                 continue
 
-            corners.append(p.id)
+            corners.append(p)
 
             i = 0
             t = p
@@ -287,7 +287,7 @@ def find_corners(id_to_tiles):
             if i < image_size:
                 continue
 
-            corners.append(p.id)
+            corners.append(p)
 
             i = 0
             t = p
@@ -299,7 +299,7 @@ def find_corners(id_to_tiles):
             if i < image_size:
                 continue
 
-            corners.append(p.id)
+            corners.append(p)
 
             i = 0
             t = p
@@ -317,13 +317,125 @@ def find_corners(id_to_tiles):
             return corners
 
 
+def get_image_grid(id_to_tiles):
+    image_size = int(math.sqrt(len(id_to_tiles.keys())))
+    corners = find_corners(id_to_tiles)
+    top_left = corners[0]
+    i = 0
+    tr = top_left
+    image_grid = []
+    while i < image_size:
+        j = 0
+        tc = tr
+        row = []
+        while j < image_size:
+            row.append(tc)
+            tc = tc.right
+            j += 1
+        i += 1
+        tr = tr.down
+        image_grid.append(row)
+
+    return image_grid
+
+
+def remove_borders(image_grid):
+    for row in image_grid:
+        for tile in row:
+            tile.content = tile.content[1:-1]
+
+            new_content = []
+            for r in tile.content:
+                new_content.append(r[1:-1])
+            tile.content = freeze_tile(new_content)
+
+
+def merge_image(image_grid):
+    image = []
+    size = len(image_grid[0][0].content)
+
+    for row in image_grid:
+        i = 0
+        while i < size:
+            line = []
+            for tile in row:
+                line += tile.content[i]
+            i += 1
+            image.append(line)
+
+    return image
+
+
+def find_monsters(image, pattern_points):
+    width = len(image[0])
+    height = len(image)
+    row = 0
+    found_monster = False
+
+    while row < height:
+        col = 0
+        while col < width:
+            points = [(r + row, c + col) for (r, c) in pattern_points if (r + row) < height and (c + col) < width]
+            cells = [image[r][c] for r, c in points]
+            if cells == ["#"] * len(pattern_points):
+                for r, c in points:
+                    image[r][c] = "O"
+                    found_monster = True
+
+            col += 1
+        row += 1
+
+    if not found_monster:
+        return None
+    else:
+        return image
+
+
 def part1():
     corners = find_corners(id_to_tiles)
     result = 1
-    for id in corners:
-        result *= id
+    for tile in corners:
+        result *= tile.id
 
     print(result)
 
 
+def part2():
+    pattern = """******************#*
+#****##****##****###
+*#**#**#**#**#**#***"""
+    pattern_points = []
+    for row, line in enumerate(pattern.split("\n")):
+        for col, c in enumerate(line):
+            if c == "#":
+                pattern_points.append((row, col))
+
+    image_grid = get_image_grid(id_to_tiles)
+    remove_borders(image_grid)
+    image = merge_image(image_grid)
+
+    image_with_monsters = None
+    while not image_with_monsters:
+        image_with_monsters = find_monsters(image, pattern_points)
+        if image_with_monsters:
+            break
+        image = flip(image)
+        image_with_monsters = find_monsters(image, pattern_points)
+        if image_with_monsters:
+            break
+
+        image = flip(image)
+        image = rotate(image)
+
+    if image_with_monsters:
+        result = 0
+        for row in image:
+            for cell in row:
+                if cell == "#":
+                    result += 1
+
+        print(result)
+
+
 part1()
+part2()
