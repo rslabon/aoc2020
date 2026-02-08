@@ -427,7 +427,6 @@ def part2():
         image = flip(image)
         image = rotate(image)
 
-
     result = 0
     for row in image:
         for cell in row:
