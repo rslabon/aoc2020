@@ -427,14 +427,14 @@ def part2():
         image = flip(image)
         image = rotate(image)
 
-    if image_with_monsters:
-        result = 0
-        for row in image:
-            for cell in row:
-                if cell == "#":
-                    result += 1
 
-        print(result)
+    result = 0
+    for row in image:
+        for cell in row:
+            if cell == "#":
+                result += 1
+
+    print(result)
 
 
 part1()
