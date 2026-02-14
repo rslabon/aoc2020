@@ -1,5 +1,4 @@
 from collections import Counter
-from typing import Any
 
 data = """
 mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
@@ -63,6 +62,7 @@ def part1():
             total += Counter(ingredients)[ingredient]
 
     print(total)
+
 
 def part2():
     allergen_to_ingredient = find_allergen_to_ingredient()
