@@ -129,10 +129,10 @@ def next_day(colors):
 
 def part2():
     colors = find_color_of_tiles()
-    black_count = 0
     for _ in range(100):
         colors = next_day(colors)
-        black_count = len([c for c in colors.values() if c])
+
+    black_count = len([c for c in colors.values() if c])
     print(black_count)
 
 
